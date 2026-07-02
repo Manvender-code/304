@@ -67,6 +67,21 @@ function App() {
         How to play it
       </button>
 
+      {/* Made By Signature */}
+      <div 
+        style={{ 
+          position: 'fixed', 
+          bottom: '25px', 
+          right: '25px', 
+          color: 'var(--text-muted)', 
+          fontFamily: 'Orbitron', 
+          fontSize: '0.8rem',
+          letterSpacing: '1px'
+        }}
+      >
+        Made by Manvender 🫶
+      </div>
+
       {/* Rules Modal */}
       {showRules && <RulesModal onClose={() => setShowRules(false)} />}
     </div>
