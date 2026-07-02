@@ -1,0 +1,18 @@
+server {
+    listen ${FRONTEND_PORT};
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        
+        # SPA routing fallback
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Optional: Cache control for static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        root /usr/share/nginx/html;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+}
