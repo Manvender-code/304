@@ -20,8 +20,8 @@ The game uses a stripped-down 32-card deck (from 7 to Jack of each suit). The go
 - **Eight (8) & Seven (7)**: 0 points (Lowest rank)
 
 ### 2. The Deal & Bidding Phase
-- Players are dealt 4 cards each initially.
-- Based on these 4 cards, players bid on how many points their team can win. 
+- Players are dealt 13 cards each initially.
+- Based on these 13 cards, players bid on how many points their team can win. 
 - Bids must be a minimum of **155** and can go up to **304**.
 - The highest bidder gets the privilege to secretly choose the **Trump Suit**.
 - After the trump is selected, the rest of the cards are dealt so everyone has 8 cards.
