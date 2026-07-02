@@ -15,8 +15,8 @@ The game uses a stripped-down 32-card deck (from 7 to Jack of each suit). The go
 - **Nine (9)**: 20 points
 - **Ace (A)**: 11 points
 - **Ten (10)**: 10 points
-- **King (K)**: 3 points
-- **Queen (Q)**: 2 points
+- **Queen (Q)**: 3 points
+- **King (K)**: 2 points
 - **Eight (8) & Seven (7)**: 0 points (Lowest rank)
 
 ### 2. The Deal & Bidding Phase
