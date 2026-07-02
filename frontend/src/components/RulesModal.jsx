@@ -14,10 +14,10 @@ export default function RulesModal({ onClose }) {
           <h3 style={{ color: 'var(--border-glow)', marginTop: '1.5rem', fontSize: '1.1rem' }}>1. The Target (304 Points)</h3>
           <p>The deck is stripped. Only 32 cards remain. The objective? Points.<br/>
           <strong>Jack = 30</strong> | <strong>Nine = 20</strong> | <strong>Ace = 11</strong> | <strong>Ten = 10</strong> | <strong>Queen = 3</strong> | <strong>King = 2</strong>.<br/>
-          (8s and 7s are worthless decoys).</p>
+          (8s,7s and remanings are worthless decoys).</p>
 
           <h3 style={{ color: 'var(--border-glow)', marginTop: '1.5rem', fontSize: '1.1rem' }}>2. The Contract (Bidding)</h3>
-          <p>Four players, two syndicates. You get 4 cards to start. Calculate your team's strength and place a bid (minimum 155). Win the bid, and you secretly dictate the <strong>Trump Suit</strong>. Choose wisely.</p>
+          <p>Four players, two syndicates. Calculate your team's strength and place a bid (minimum 155). Win the bid, and you secretly dictate the <strong>Trump Suit</strong>. Choose wisely.</p>
 
           <h3 style={{ color: 'var(--border-glow)', marginTop: '1.5rem', fontSize: '1.1rem' }}>3. The Execution (Tricks)</h3>
           <p>When a suit is led, you <strong>must follow suit</strong>. No exceptions. If you are out of that suit, you can strike from the shadows with a Trump card or throw away garbage. Highest card of the lead suit wins, unless Trump is played.</p>
