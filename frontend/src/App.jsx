@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import GameBoard from './components/GameBoard';
+import RulesModal from './components/RulesModal';
 
 function App() {
   const [roomId, setRoomId] = useState('');
   const [inputRoom, setInputRoom] = useState('');
+  const [showRules, setShowRules] = useState(false);
 
   if (roomId) {
     return <GameBoard roomId={roomId} onLeave={() => setRoomId('')} />;
@@ -46,6 +48,27 @@ function App() {
           </button>
         </div>
       </div>
+
+      {/* How to Play Button */}
+      <button 
+        className="btn"
+        style={{ 
+          position: 'fixed', 
+          bottom: '20px', 
+          left: '20px', 
+          background: 'transparent',
+          border: '1px solid var(--primary)',
+          fontSize: '0.8rem',
+          padding: '8px 16px',
+          boxShadow: 'none'
+        }}
+        onClick={() => setShowRules(true)}
+      >
+        How to play it
+      </button>
+
+      {/* Rules Modal */}
+      {showRules && <RulesModal onClose={() => setShowRules(false)} />}
     </div>
   );
 }
