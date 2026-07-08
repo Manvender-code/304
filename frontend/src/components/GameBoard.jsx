@@ -265,11 +265,17 @@ export default function GameBoard({ roomId, onLeave }) {
                     const team1Points = gameState.tricks_won_team_1?.reduce((a,c) => a+c.value, 0) || 0;
                     const team2Points = gameState.tricks_won_team_2?.reduce((a,c) => a+c.value, 0) || 0;
                     let nonBiddingPoints = 0;
+                    let biddingPoints = 0;
                     if (gameState.bid_winner && gameState.players[gameState.bid_winner]) {
                       const bidTeam = gameState.players[gameState.bid_winner].team;
+                      biddingPoints = bidTeam === 1 ? team1Points : team2Points;
                       nonBiddingPoints = bidTeam === 1 ? team2Points : team1Points;
                     }
-                    return nonBiddingPoints >= (304 - gameState.highest_bid) ? (
+                    
+                    const nonBiddingWins = nonBiddingPoints > (304 - gameState.highest_bid);
+                    const biddingWins = biddingPoints >= gameState.highest_bid;
+                    
+                    return (nonBiddingWins || biddingWins) ? (
                       <div style={{ marginTop: '8px' }}>
                         <button className="btn btn-danger" style={{ padding: '6px 12px', fontSize: '0.8rem' }} onClick={() => sendAction({ type: "end_round_early" })}>
                           EXECUTE EARLY TERMINATION
