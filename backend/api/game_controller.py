@@ -123,6 +123,9 @@ class GameController:
                 await self._start_turn_timer(room_id, state.current_turn)
 
         elif action_type == "play_card" and state.phase == "playing":
+            if len(state.current_trick.cards_played) == 4:
+                return # Ignore plays during the 2-second resolution delay
+
             if state.current_turn == user_id:
                 self._cancel_timer(room_id)
                 card_dict = action.get("card")
@@ -140,41 +143,57 @@ class GameController:
                     state.current_trick.cards_played[user_id] = card
                     
                     if len(state.current_trick.cards_played) == 4:
-                        # Evaluate trick
-                        winner_id = evaluate_trick(state.current_trick.cards_played, state.current_trick.lead_suit, state.trump_suit)
-                        winner_team = state.players[winner_id].team
+                        # 1. Save and broadcast immediately so 4th card is visible
+                        await self.state_store.save_game_state(state)
+                        await self.room_manager.broadcast(room_id)
                         
-                        won_cards = list(state.current_trick.cards_played.values())
-                        state.trick_history.extend(won_cards)
-                        if winner_team == 1:
-                            state.tricks_won_team_1.extend(won_cards)
-                        else:
-                            state.tricks_won_team_2.extend(won_cards)
+                        # 2. Evaluate trick after 2 seconds
+                        async def evaluate_and_next_trick(r_id=room_id):
+                            await asyncio.sleep(2.0)
+                            curr_state = await self.state_store.get_game_state(r_id)
+                            if not curr_state or curr_state.phase != "playing":
+                                return
                             
-                        state.current_trick.cards_played.clear()
-                        state.current_trick.lead_suit = None
-                        state.current_turn = winner_id
-                        
-                        # Check round end
-                        if not player.hand:
-                            calculate_round_score(state)
-                            if state.phase != "game_over":
-                                state.phase = "scoring"
-                                state.deck_state = state.trick_history.copy()
+                            winner_id = evaluate_trick(curr_state.current_trick.cards_played, curr_state.current_trick.lead_suit, curr_state.trump_suit)
+                            winner_team = curr_state.players[winner_id].team
+                            
+                            won_cards = list(curr_state.current_trick.cards_played.values())
+                            curr_state.trick_history.extend(won_cards)
+                            if winner_team == 1:
+                                curr_state.tricks_won_team_1.extend(won_cards)
+                            else:
+                                curr_state.tricks_won_team_2.extend(won_cards)
                                 
-                                async def transition_to_shuffling(r_id=room_id):
-                                    await asyncio.sleep(5)
-                                    curr_state = await self.state_store.get_game_state(r_id)
-                                    if curr_state and curr_state.phase == "scoring":
-                                        curr_state.phase = "shuffling"
-                                        curr_state.current_turn = curr_state.shuffler_id
-                                        await self.state_store.save_game_state(curr_state)
-                                        await self.room_manager.broadcast(r_id)
-                                asyncio.create_task(transition_to_shuffling())
-                        else:
-                            import time
-                            state.turn_start_time = time.time()
-                            await self._start_turn_timer(room_id, state.current_turn)
+                            curr_state.current_trick.cards_played.clear()
+                            curr_state.current_trick.lead_suit = None
+                            curr_state.current_turn = winner_id
+                            
+                            # Check round end
+                            if not curr_state.players[user_id].hand:
+                                calculate_round_score(curr_state)
+                                if curr_state.phase != "game_over":
+                                    curr_state.phase = "scoring"
+                                    curr_state.deck_state = curr_state.trick_history.copy()
+                                    
+                                    async def transition_to_shuffling(room_i=r_id):
+                                        await asyncio.sleep(5)
+                                        final_state = await self.state_store.get_game_state(room_i)
+                                        if final_state and final_state.phase == "scoring":
+                                            final_state.phase = "shuffling"
+                                            final_state.current_turn = final_state.shuffler_id
+                                            await self.state_store.save_game_state(final_state)
+                                            await self.room_manager.broadcast(room_i)
+                                    asyncio.create_task(transition_to_shuffling())
+                            else:
+                                import time
+                                curr_state.turn_start_time = time.time()
+                                await self._start_turn_timer(r_id, curr_state.current_turn)
+                                
+                            await self.state_store.save_game_state(curr_state)
+                            await self.room_manager.broadcast(r_id)
+                            
+                        asyncio.create_task(evaluate_and_next_trick())
+                        return # Stop here because broadcast is handled by the async task
                     else:
                         idx = state.deal_order.index(state.current_turn)
                         state.current_turn = state.deal_order[(idx + 1) % 4]
